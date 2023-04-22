@@ -7,21 +7,25 @@ import os
 import time
 import threading
 import sys
+# 获取当前工作目录的绝对路径
+cwd = os.path.abspath(os.getcwd())
 
 # 设置Chrome浏览器选项
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 chrome_path = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
 chrome_options.binary_location = chrome_path
+chrome_options.add_argument("--log-level=3")
 
 # 检查是否存在cookie文件
-if os.path.isfile("cookies.pkl"):
+cookies_file = os.path.join(cwd, "cookies.pkl") # 将相对路径转换为绝对路径
+if os.path.isfile(cookies_file):
     # 如果文件存在，则加载cookie
     driver = webdriver.Chrome(options=chrome_options)
     driver.get("https://link.bilibili.com/#/my-room/start-live")
 
     # 加载cookie
-    cookies = pickle.load(open("cookies.pkl", "rb"))
+    cookies = pickle.load(open(cookies_file, "rb"))
     for cookie in cookies:
         driver.add_cookie(cookie)
 
@@ -37,7 +41,7 @@ else:
     input("请在浏览器中登录并按Enter键继续：")
 
     # 保存cookie以供下一次使用
-    pickle.dump(driver.get_cookies(), open("cookies.pkl", "wb"))
+    pickle.dump(driver.get_cookies(), open(cookies_file, "wb"))
 
     # 打印当前页面 URL
     print("当前页面 URL：", driver.current_url)
